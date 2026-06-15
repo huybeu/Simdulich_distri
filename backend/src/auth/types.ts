@@ -21,6 +21,8 @@ export type PricingConfig = {
   tierMarkupVnd: Record<Exclude<UserRole, "admin">, number>;
   /** Hệ số × riêng theo cấp — 0 nghĩa là dùng ntToVndRate chung. */
   tierRate: Record<Exclude<UserRole, "admin">, number>;
+  /** Hệ số × riêng theo loại SIM — 0 nghĩa là dùng rate của cấp. */
+  simTypeRate: { esim: number; sim_vat_ly: number };
 };
 
 export type SessionRecord = {

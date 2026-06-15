@@ -17,6 +17,7 @@ export type PricingProfile = {
   ntToVndRate: number;
   markupVnd: number;
   role: UserRole;
+  simTypeRate?: { esim: number; sim_vat_ly: number };
 };
 
 export type LoginResponse = {

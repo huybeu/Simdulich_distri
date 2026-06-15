@@ -13,6 +13,7 @@ export type SystemConfig = {
   ntToVndRate: number;
   tierMarkupVnd: PricingConfig["tierMarkupVnd"];
   tierRate: PricingConfig["tierRate"];
+  simTypeRate: PricingConfig["simTypeRate"];
   /** @deprecated dùng tierMarkupVnd */
   tierMarkupPercent?: { tong_kho: number; dai_ly: number };
 };
@@ -25,6 +26,7 @@ const DEFAULT_SYSTEM: SystemConfig = {
   ntToVndRate: 850,
   tierMarkupVnd: { tong_kho: 0, dai_ly: 0 },
   tierRate: { tong_kho: 0, dai_ly: 0 },
+  simTypeRate: { esim: 0, sim_vat_ly: 0 },
 };
 
 let cache: SystemConfig = { ...DEFAULT_SYSTEM };
@@ -50,6 +52,10 @@ function normalize(input: Partial<SystemConfig>): SystemConfig {
     tierRate: {
       tong_kho: Number(input.tierRate?.tong_kho ?? cache.tierRate?.tong_kho ?? 0),
       dai_ly:   Number(input.tierRate?.dai_ly   ?? cache.tierRate?.dai_ly   ?? 0),
+    },
+    simTypeRate: {
+      esim:       Number(input.simTypeRate?.esim       ?? cache.simTypeRate?.esim       ?? 0),
+      sim_vat_ly: Number(input.simTypeRate?.sim_vat_ly ?? cache.simTypeRate?.sim_vat_ly ?? 0),
     },
   };
 }
@@ -99,6 +105,7 @@ export function getPricingFromSystem(): PricingConfig {
     ntToVndRate: cache.ntToVndRate,
     tierMarkupVnd: cache.tierMarkupVnd,
     tierRate: cache.tierRate ?? { tong_kho: 0, dai_ly: 0 },
+    simTypeRate: cache.simTypeRate ?? { esim: 0, sim_vat_ly: 0 },
   };
 }
 
@@ -109,6 +116,7 @@ export type SystemConfigPublic = {
   ntToVndRate: number;
   tierMarkupVnd: PricingConfig["tierMarkupVnd"];
   tierRate: PricingConfig["tierRate"];
+  simTypeRate: PricingConfig["simTypeRate"];
   configured: boolean;
   tokenSet: boolean;
 };
@@ -121,6 +129,7 @@ export function toPublicSystemConfig(): SystemConfigPublic {
     ntToVndRate: cache.ntToVndRate,
     tierMarkupVnd: cache.tierMarkupVnd,
     tierRate: cache.tierRate ?? { tong_kho: 0, dai_ly: 0 },
+    simTypeRate: cache.simTypeRate ?? { esim: 0, sim_vat_ly: 0 },
     configured: Boolean(cache.merchantId && cache.deptId && cache.token),
     tokenSet: Boolean(cache.token),
   };

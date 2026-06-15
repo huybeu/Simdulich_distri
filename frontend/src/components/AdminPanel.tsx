@@ -10,6 +10,7 @@ type PricingConfig = {
   ntToVndRate: number;
   tierMarkupVnd: { tong_kho: number; dai_ly: number };
   tierRate: { tong_kho: number; dai_ly: number };
+  simTypeRate: { esim: number; sim_vat_ly: number };
 };
 
 type Props = {
@@ -43,6 +44,7 @@ export function AdminPanel({ onPricingUpdated }: Props) {
       setConfig({
         ...cfg,
         tierRate: cfg.tierRate ?? { tong_kho: 0, dai_ly: 0 },
+        simTypeRate: cfg.simTypeRate ?? { esim: 0, sim_vat_ly: 0 },
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Không tải được dữ liệu quản trị.");
@@ -61,6 +63,7 @@ export function AdminPanel({ onPricingUpdated }: Props) {
       ntToVndRate: config.ntToVndRate,
       tierMarkupVnd: config.tierMarkupVnd,
       tierRate: config.tierRate,
+      simTypeRate: config.simTypeRate,
     });
     setConfig(saved);
     onPricingUpdated({
@@ -185,6 +188,49 @@ export function AdminPanel({ onPricingUpdated }: Props) {
               />
             </label>
 
+            {/* Phân cách loại SIM */}
+            <div className="pricing-col-header" style={{ gridColumn: "1 / 4", marginTop: "0.75rem", borderTop: "1px solid var(--c-border)", paddingTop: "0.75rem" }}>
+              Hệ số × riêng theo loại SIM (ghi đè hệ số cấp nếu &gt; 0)
+            </div>
+
+            {/* eSIM */}
+            <div className="pricing-row-label">eSIM</div>
+            <label className="pricing-cell">
+              <input
+                type="number"
+                min={0}
+                value={config.simTypeRate.esim}
+                placeholder={String(config.ntToVndRate)}
+                onChange={(e) =>
+                  setConfig({
+                    ...config,
+                    simTypeRate: { ...config.simTypeRate, esim: Number(e.target.value) || 0 },
+                  })
+                }
+              />
+              <span className="pricing-hint">0 = dùng hệ số cấp</span>
+            </label>
+            <div className="pricing-cell pricing-muted">—</div>
+
+            {/* SIM vật lý */}
+            <div className="pricing-row-label">SIM vật lý</div>
+            <label className="pricing-cell">
+              <input
+                type="number"
+                min={0}
+                value={config.simTypeRate.sim_vat_ly}
+                placeholder={String(config.ntToVndRate)}
+                onChange={(e) =>
+                  setConfig({
+                    ...config,
+                    simTypeRate: { ...config.simTypeRate, sim_vat_ly: Number(e.target.value) || 0 },
+                  })
+                }
+              />
+              <span className="pricing-hint">0 = dùng hệ số cấp</span>
+            </label>
+            <div className="pricing-cell pricing-muted">—</div>
+
             {/* Preview công thức */}
             <div className="pricing-row-label pricing-muted">Công thức</div>
             <div className="pricing-cell pricing-formula" style={{ gridColumn: "2 / 4" }}>
@@ -192,6 +238,9 @@ export function AdminPanel({ onPricingUpdated }: Props) {
               {config.tierMarkupVnd.tong_kho.toLocaleString("vi-VN")} (tổng kho) &nbsp;|&nbsp;
               NT × {config.tierRate.dai_ly || config.ntToVndRate} +{" "}
               {config.tierMarkupVnd.dai_ly.toLocaleString("vi-VN")} (đại lý)
+              {(config.simTypeRate.esim > 0 || config.simTypeRate.sim_vat_ly > 0) && (
+                <> &nbsp;|&nbsp; eSIM ×{config.simTypeRate.esim || "cấp"} / SIM vật lý ×{config.simTypeRate.sim_vat_ly || "cấp"}</>
+              )}
             </div>
           </div>
         ) : null}

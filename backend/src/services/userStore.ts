@@ -102,6 +102,8 @@ export async function savePricingConfig(
   await saveSystemConfig({
     ntToVndRate: pricing.ntToVndRate,
     tierMarkupVnd: pricing.tierMarkupVnd,
+    tierRate: pricing.tierRate,
+    simTypeRate: pricing.simTypeRate,
   });
   return getPricingFromSystem();
 }
@@ -119,13 +121,32 @@ export function resolveMarkupVnd(
 
 /**
  * Hệ số × áp dụng cho cấp của user.
- * Nếu tierRate[role] > 0 dùng tier rate, ngược lại fallback về ntToVndRate chung.
+ * Ưu tiên: simTypeRate (theo loại SIM) > tierRate (theo cấp) > ntToVndRate chung.
  */
 export function resolveRate(
   user: UserRecord,
-  config: PricingConfig
+  config: PricingConfig,
+  leSIM?: boolean,
 ): number {
-  if (user.role === "admin") return config.ntToVndRate;
+  if (user.role === "admin") {
+    // Admin: simTypeRate > ntToVndRate
+    if (leSIM === true) {
+      const r = config.simTypeRate?.esim ?? 0;
+      if (r > 0) return r;
+    } else if (leSIM === false) {
+      const r = config.simTypeRate?.sim_vat_ly ?? 0;
+      if (r > 0) return r;
+    }
+    return config.ntToVndRate;
+  }
+  // Sub-accounts: simTypeRate > tierRate > ntToVndRate
+  if (leSIM === true) {
+    const r = config.simTypeRate?.esim ?? 0;
+    if (r > 0) return r;
+  } else if (leSIM === false) {
+    const r = config.simTypeRate?.sim_vat_ly ?? 0;
+    if (r > 0) return r;
+  }
   const tier = config.tierRate?.[user.role as "tong_kho" | "dai_ly"] ?? 0;
   return tier > 0 ? tier : config.ntToVndRate;
 }
