@@ -199,8 +199,8 @@ function OrdersChart({ orders }: { orders: OrderRow[] }) {
           <XAxis dataKey="name" tick={{ fontSize: 12 }} />
           <YAxis tickFormatter={(v: number) => v + "%"} tick={{ fontSize: 11 }} domain={[0, 100]} />
           <Tooltip
-            formatter={(value: number, _name: string, entry: { payload?: { qty: number } }) => [
-              value + "% (" + (entry.payload?.qty ?? 0) + " SIM)",
+            formatter={(value, _name, entry) => [
+              Number(value).toFixed(1) + "% (" + ((entry as { payload?: { qty: number } }).payload?.qty ?? 0) + " SIM)",
               "Tỷ lệ",
             ]}
           />
