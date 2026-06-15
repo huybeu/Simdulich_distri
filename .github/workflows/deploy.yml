@@ -1,0 +1,25 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            cd /var/www/simdulich
+            git pull
+            npm install --prefix backend
+            npm install --prefix frontend
+            VITE_BASE_PATH=/distri/ npm run build --prefix frontend
+            pm2 restart simdulich-api
+            echo "Deploy xong!"
