@@ -1133,7 +1133,7 @@ function App({ authUser, pricing, onPricingUpdated }: AppProps) {
               </>
             )}
             <ResultBox {...api} />
-            {(lastOrderPayload || (api.result as unknown)) && (
+            {(lastOrderPayload != null || api.result != null) && (
               <div className="order-log-panel">
                 <h4>📋 Log đơn hàng</h4>
                 {lastOrderPayload && (
@@ -1155,7 +1155,7 @@ function App({ authUser, pricing, onPricingUpdated }: AppProps) {
                     </table>
                   </div>
                 )}
-                {(api.result as unknown) && (
+                {api.result != null && (
                   <div className="order-log-section">
                     <div className="order-log-title">Response từ Worldmove</div>
                     <table className="order-log-table">
