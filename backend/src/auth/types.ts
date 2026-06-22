@@ -23,6 +23,8 @@ export type PricingConfig = {
   tierRate: Record<Exclude<UserRole, "admin">, number>;
   /** Hệ số × riêng theo loại SIM — 0 nghĩa là dùng rate của cấp. */
   simTypeRate: { esim: number; sim_vat_ly: number };
+  /** Markup VND cố định riêng theo loại SIM — cộng thêm vào giá sau khi nhân hệ số. */
+  simTypeMarkupVnd: { esim: number; sim_vat_ly: number };
 };
 
 export type SessionRecord = {

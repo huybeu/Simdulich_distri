@@ -11,6 +11,7 @@ type PricingConfig = {
   tierMarkupVnd: { tong_kho: number; dai_ly: number };
   tierRate: { tong_kho: number; dai_ly: number };
   simTypeRate: { esim: number; sim_vat_ly: number };
+  simTypeMarkupVnd: { esim: number; sim_vat_ly: number };
 };
 
 type Props = {
@@ -45,6 +46,7 @@ export function AdminPanel({ onPricingUpdated }: Props) {
         ...cfg,
         tierRate: cfg.tierRate ?? { tong_kho: 0, dai_ly: 0 },
         simTypeRate: cfg.simTypeRate ?? { esim: 0, sim_vat_ly: 0 },
+        simTypeMarkupVnd: cfg.simTypeMarkupVnd ?? { esim: 0, sim_vat_ly: 0 },
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Không tải được dữ liệu quản trị.");
@@ -64,6 +66,7 @@ export function AdminPanel({ onPricingUpdated }: Props) {
       tierMarkupVnd: config.tierMarkupVnd,
       tierRate: config.tierRate,
       simTypeRate: config.simTypeRate,
+      simTypeMarkupVnd: config.simTypeMarkupVnd,
     });
     setConfig(saved);
     onPricingUpdated({
@@ -210,7 +213,20 @@ export function AdminPanel({ onPricingUpdated }: Props) {
               />
               <span className="pricing-hint">0 = dùng hệ số cấp</span>
             </label>
-            <div className="pricing-cell pricing-muted">—</div>
+            <label className="pricing-cell">
+              <input
+                type="number"
+                step={1000}
+                min={0}
+                value={config.simTypeMarkupVnd.esim}
+                onChange={(e) =>
+                  setConfig({
+                    ...config,
+                    simTypeMarkupVnd: { ...config.simTypeMarkupVnd, esim: Number(e.target.value) || 0 },
+                  })
+                }
+              />
+            </label>
 
             {/* SIM vật lý */}
             <div className="pricing-row-label">SIM vật lý</div>
@@ -229,7 +245,20 @@ export function AdminPanel({ onPricingUpdated }: Props) {
               />
               <span className="pricing-hint">0 = dùng hệ số cấp</span>
             </label>
-            <div className="pricing-cell pricing-muted">—</div>
+            <label className="pricing-cell">
+              <input
+                type="number"
+                step={1000}
+                min={0}
+                value={config.simTypeMarkupVnd.sim_vat_ly}
+                onChange={(e) =>
+                  setConfig({
+                    ...config,
+                    simTypeMarkupVnd: { ...config.simTypeMarkupVnd, sim_vat_ly: Number(e.target.value) || 0 },
+                  })
+                }
+              />
+            </label>
 
             {/* Preview công thức */}
             <div className="pricing-row-label pricing-muted">Công thức</div>
@@ -238,8 +267,11 @@ export function AdminPanel({ onPricingUpdated }: Props) {
               {config.tierMarkupVnd.tong_kho.toLocaleString("vi-VN")} (tổng kho) &nbsp;|&nbsp;
               NT × {config.tierRate.dai_ly || config.ntToVndRate} +{" "}
               {config.tierMarkupVnd.dai_ly.toLocaleString("vi-VN")} (đại lý)
-              {(config.simTypeRate.esim > 0 || config.simTypeRate.sim_vat_ly > 0) && (
-                <> &nbsp;|&nbsp; eSIM ×{config.simTypeRate.esim || "cấp"} / SIM vật lý ×{config.simTypeRate.sim_vat_ly || "cấp"}</>
+              {(config.simTypeRate.esim > 0 || config.simTypeMarkupVnd.esim > 0) && (
+                <> &nbsp;|&nbsp; eSIM: NT×{config.simTypeRate.esim || "cấp"} +{config.simTypeMarkupVnd.esim.toLocaleString("vi-VN")}</>
+              )}
+              {(config.simTypeRate.sim_vat_ly > 0 || config.simTypeMarkupVnd.sim_vat_ly > 0) && (
+                <> &nbsp;|&nbsp; SIM vật lý: NT×{config.simTypeRate.sim_vat_ly || "cấp"} +{config.simTypeMarkupVnd.sim_vat_ly.toLocaleString("vi-VN")}</>
               )}
             </div>
           </div>

@@ -178,11 +178,19 @@ adminRouter.patch("/pricing-config", async (req: AuthedRequest, res, next) => {
       if (req.body.simTypeRate.sim_vat_ly !== undefined)
         simTypeRate.sim_vat_ly = Number(req.body.simTypeRate.sim_vat_ly);
     }
+    const simTypeMarkupVnd = { ...(current.simTypeMarkupVnd ?? { esim: 0, sim_vat_ly: 0 }) };
+    if (req.body?.simTypeMarkupVnd) {
+      if (req.body.simTypeMarkupVnd.esim !== undefined)
+        simTypeMarkupVnd.esim = Number(req.body.simTypeMarkupVnd.esim);
+      if (req.body.simTypeMarkupVnd.sim_vat_ly !== undefined)
+        simTypeMarkupVnd.sim_vat_ly = Number(req.body.simTypeMarkupVnd.sim_vat_ly);
+    }
     const saved = await savePricingConfig({
       ntToVndRate: Number.isFinite(ntToVndRate) ? ntToVndRate : current.ntToVndRate,
       tierMarkupVnd,
       tierRate,
       simTypeRate,
+      simTypeMarkupVnd,
     });
     broadcastEvent("pricing-updated", { ntToVndRate: saved.ntToVndRate });
     res.json(saved);

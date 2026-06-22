@@ -18,6 +18,7 @@ export type PricingProfile = {
   markupVnd: number;
   role: UserRole;
   simTypeRate?: { esim: number; sim_vat_ly: number };
+  simTypeMarkupVnd?: { esim: number; sim_vat_ly: number };
 };
 
 export type LoginResponse = {

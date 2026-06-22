@@ -239,6 +239,7 @@ function mapProductsToPlans(
   rate: number,
   markupVnd: number,
   simTypeRate?: { esim: number; sim_vat_ly: number },
+  simTypeMarkupVnd?: { esim: number; sim_vat_ly: number },
 ): EsimPlan[] {
   return products.map((p) => {
     let effectiveRate = rate;
@@ -246,12 +247,15 @@ function mapProductsToPlans(
       const r = p.leSIM ? simTypeRate.esim : simTypeRate.sim_vat_ly;
       if (r > 0) effectiveRate = r;
     }
+    const extraMarkup = simTypeMarkupVnd
+      ? (p.leSIM ? simTypeMarkupVnd.esim : simTypeMarkupVnd.sim_vat_ly) ?? 0
+      : 0;
     return {
       id: p.wmproductId,
       wmproductId: p.wmproductId,
       country: parseCountry(p.productName),
       planName: String(p.productName ?? p.wmproductId),
-      price: applyMarkupVnd(p.productPrice ?? 0, effectiveRate, markupVnd),
+      price: applyMarkupVnd(p.productPrice ?? 0, effectiveRate, markupVnd + extraMarkup),
     };
   });
 }
@@ -462,14 +466,15 @@ function App({ authUser, pricing, onPricingUpdated }: AppProps) {
   const leSimOnlyProducts = esimProducts;
 
   const simTypeRate = pricing.simTypeRate;
+  const simTypeMarkupVnd = pricing.simTypeMarkupVnd;
 
   const esimPlans = useMemo<EsimPlan[]>(() => {
     if (esimProducts.length > 0) {
-      return mapProductsToPlans(esimProducts, displayRate, markupVnd, simTypeRate);
+      return mapProductsToPlans(esimProducts, displayRate, markupVnd, simTypeRate, simTypeMarkupVnd);
     }
     if (orderOnly) return [];
-    return mapProductsToPlans(FALLBACK_ESIM_PLANS as unknown as QuoteProduct[], displayRate, markupVnd, simTypeRate);
-  }, [esimProducts, displayRate, markupVnd, simTypeRate, orderOnly]);
+    return mapProductsToPlans(FALLBACK_ESIM_PLANS as unknown as QuoteProduct[], displayRate, markupVnd, simTypeRate, simTypeMarkupVnd);
+  }, [esimProducts, displayRate, markupVnd, simTypeRate, simTypeMarkupVnd, orderOnly]);
 
   const physicalProducts = useMemo(() => {
     const nonEsim = quotes.filter((p) => !p.leSIM);
@@ -477,8 +482,8 @@ function App({ authUser, pricing, onPricingUpdated }: AppProps) {
   }, [quotes]);
 
   const physicalPlans = useMemo(
-    () => mapProductsToPlans(physicalProducts, displayRate, markupVnd, simTypeRate),
-    [physicalProducts, displayRate, markupVnd, simTypeRate],
+    () => mapProductsToPlans(physicalProducts, displayRate, markupVnd, simTypeRate, simTypeMarkupVnd),
+    [physicalProducts, displayRate, markupVnd, simTypeRate, simTypeMarkupVnd],
   );
 
   const countryOptions = useMemo(

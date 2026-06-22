@@ -14,6 +14,7 @@ export type SystemConfig = {
   tierMarkupVnd: PricingConfig["tierMarkupVnd"];
   tierRate: PricingConfig["tierRate"];
   simTypeRate: PricingConfig["simTypeRate"];
+  simTypeMarkupVnd: PricingConfig["simTypeMarkupVnd"];
   /** @deprecated dùng tierMarkupVnd */
   tierMarkupPercent?: { tong_kho: number; dai_ly: number };
 };
@@ -27,6 +28,7 @@ const DEFAULT_SYSTEM: SystemConfig = {
   tierMarkupVnd: { tong_kho: 0, dai_ly: 0 },
   tierRate: { tong_kho: 0, dai_ly: 0 },
   simTypeRate: { esim: 0, sim_vat_ly: 0 },
+  simTypeMarkupVnd: { esim: 0, sim_vat_ly: 0 },
 };
 
 let cache: SystemConfig = { ...DEFAULT_SYSTEM };
@@ -56,6 +58,10 @@ function normalize(input: Partial<SystemConfig>): SystemConfig {
     simTypeRate: {
       esim:       Number(input.simTypeRate?.esim       ?? cache.simTypeRate?.esim       ?? 0),
       sim_vat_ly: Number(input.simTypeRate?.sim_vat_ly ?? cache.simTypeRate?.sim_vat_ly ?? 0),
+    },
+    simTypeMarkupVnd: {
+      esim:       Number(input.simTypeMarkupVnd?.esim       ?? cache.simTypeMarkupVnd?.esim       ?? 0),
+      sim_vat_ly: Number(input.simTypeMarkupVnd?.sim_vat_ly ?? cache.simTypeMarkupVnd?.sim_vat_ly ?? 0),
     },
   };
 }
@@ -106,6 +112,7 @@ export function getPricingFromSystem(): PricingConfig {
     tierMarkupVnd: cache.tierMarkupVnd,
     tierRate: cache.tierRate ?? { tong_kho: 0, dai_ly: 0 },
     simTypeRate: cache.simTypeRate ?? { esim: 0, sim_vat_ly: 0 },
+    simTypeMarkupVnd: cache.simTypeMarkupVnd ?? { esim: 0, sim_vat_ly: 0 },
   };
 }
 
@@ -117,6 +124,7 @@ export type SystemConfigPublic = {
   tierMarkupVnd: PricingConfig["tierMarkupVnd"];
   tierRate: PricingConfig["tierRate"];
   simTypeRate: PricingConfig["simTypeRate"];
+  simTypeMarkupVnd: PricingConfig["simTypeMarkupVnd"];
   configured: boolean;
   tokenSet: boolean;
 };
@@ -130,6 +138,7 @@ export function toPublicSystemConfig(): SystemConfigPublic {
     tierMarkupVnd: cache.tierMarkupVnd,
     tierRate: cache.tierRate ?? { tong_kho: 0, dai_ly: 0 },
     simTypeRate: cache.simTypeRate ?? { esim: 0, sim_vat_ly: 0 },
+    simTypeMarkupVnd: cache.simTypeMarkupVnd ?? { esim: 0, sim_vat_ly: 0 },
     configured: Boolean(cache.merchantId && cache.deptId && cache.token),
     tokenSet: Boolean(cache.token),
   };

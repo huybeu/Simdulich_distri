@@ -104,6 +104,7 @@ export async function savePricingConfig(
     tierMarkupVnd: pricing.tierMarkupVnd,
     tierRate: pricing.tierRate,
     simTypeRate: pricing.simTypeRate,
+    simTypeMarkupVnd: pricing.simTypeMarkupVnd,
   });
   return getPricingFromSystem();
 }
@@ -154,6 +155,13 @@ export function resolveRate(
 /** @deprecated dùng resolveMarkupVnd */
 export function resolveMarkupPercent(user: UserRecord, config: PricingConfig): number {
   return resolveMarkupVnd(user, config);
+}
+
+/** Markup VND cộng thêm riêng theo loại SIM (cộng thêm trên markupVnd của cấp). */
+export function resolveSimTypeMarkup(config: PricingConfig, leSIM?: boolean): number {
+  if (leSIM === true) return config.simTypeMarkupVnd?.esim ?? 0;
+  if (leSIM === false) return config.simTypeMarkupVnd?.sim_vat_ly ?? 0;
+  return 0;
 }
 
 export function applyDisplayMarkup(baseNt: number, rate: number, markupVnd: number): number {
